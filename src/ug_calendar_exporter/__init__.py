@@ -1,12 +1,9 @@
 import logging
 from http.server import HTTPServer
 from typing import Any
-from zoneinfo import ZoneInfo
 
 from ug_calendar_exporter.config import Config
 from ug_calendar_exporter.server import RequestHandler
-
-TZ = ZoneInfo("Europe/Warsaw")
 
 log = logging.getLogger(__name__)
 
