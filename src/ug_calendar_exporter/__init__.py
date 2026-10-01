@@ -1,11 +1,14 @@
+from zoneinfo import ZoneInfo
+
 import httpx
 
+from ug_calendar_exporter.calendar import make_calendar
 from ug_calendar_exporter.calendar_parser import CalendarParser
-from ug_calendar_exporter.dates import parse_header_month
 
 CALENDAR_WEBPAGE_URL = (
     "https://inf.ug.edu.pl/terminy-zjazdow-semestr-zimowy-2026-27.print"
 )
+TZ = ZoneInfo("Europe/Warsaw")
 
 
 def main() -> None:
@@ -13,12 +16,7 @@ def main() -> None:
     parser = CalendarParser()
     parser.feed(res.text)
 
-    for row in parser.parsed_rows:
-        year, month = parse_header_month(row.header)
-        print(f"{year}-{month:<02}")
+    calendar = make_calendar(parser.parsed_rows)
 
-        for cell in row.cells:
-            if cell.url is None:
-                print(f" {cell.name}")
-            else:
-                print(f" {cell.name} -> {cell.url}")
+    with open("out.ics", "w") as out:
+        out.write(calendar.serialize())
