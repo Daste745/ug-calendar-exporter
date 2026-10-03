@@ -1,3 +1,5 @@
+from datetime import datetime
+
 MONTHS = {
     "styczeń": 1,
     "luty": 2,
@@ -24,3 +26,8 @@ def parse_header_month(header: str) -> tuple[Year, Month]:
     if month is None:
         raise ValueError(f"Invalid month: {month_str}")
     return int(year_str.strip()), month
+
+
+def parse_time_string(time_str: str, base: datetime) -> datetime:
+    hour, minute = time_str.split(":")
+    return base.replace(hour=int(hour), minute=int(minute))
