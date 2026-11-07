@@ -22,6 +22,6 @@ class Config:
             CALENDAR_URL=environ.get("CALENDAR_URL", "calendar"),
             SOURCE_WEBPAGE_URL=environ.get(
                 "SOURCE_WEBPAGE_URL",
-                "https://inf.ug.edu.pl/terminy-zjazdow-semestr-zimowy-2026-27.print",
+                "https://inf.ug.edu.pl/zaoczne-plan/",
             ),
         )

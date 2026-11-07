@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from html.parser import HTMLParser
-from typing import Self
+from typing import TYPE_CHECKING, Self
+
+if TYPE_CHECKING:
+    from ug_calendar_exporter.config import Config
 
 
 class CellBuilder:
@@ -19,14 +22,20 @@ class CellBuilder:
         self.url = value
         return self
 
-    def build(self) -> Cell:
+    def build(self, config: Config) -> Cell:
         if self.name is None:
             raise ValueError("Cannot build cell: name is not set")
 
         if self.url is None:
             raise ValueError("Cannot build cell: url is not set")
 
-        return Cell(self.name, self.url)
+        url = (
+            config.SOURCE_WEBPAGE_URL + self.url
+            if not self.url.startswith("http")
+            else self.url
+        )
+
+        return Cell(self.name, url)
 
 
 @dataclass
@@ -68,6 +77,7 @@ class Row:
 
 
 class CalendarParser(HTMLParser):
+    config: Config
     _in_table: bool = False
     _row_builder: RowBuilder | None = None
     _parsing_header: bool = False
@@ -75,8 +85,9 @@ class CalendarParser(HTMLParser):
     _cell_builder: CellBuilder | None = None
     _parsed_rows: list[Row]
 
-    def __init__(self) -> None:
+    def __init__(self, config: Config) -> None:
         super().__init__()
+        self.config = config
         self._parsed_rows = []
 
     @property
@@ -152,7 +163,7 @@ class CalendarParser(HTMLParser):
                 raise ValueError("Unexpected start tag: a. No row is being built")
             if self._cell_builder is None:
                 raise ValueError("Unexpected start tag: a. No link cell is being built")
-            link = self._cell_builder.build()
+            link = self._cell_builder.build(self.config)
             self._row_builder.add_cell(link)
             self._cell_builder = None
             return

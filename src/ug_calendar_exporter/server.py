@@ -33,7 +33,7 @@ class RequestHandler(BaseHTTPRequestHandler):
     def _calendar(self) -> None:
         try:
             res = httpx.get(self.config.SOURCE_WEBPAGE_URL)
-            parser = CalendarParser()
+            parser = CalendarParser(self.config)
             parser.feed(res.text)
             schedules: list[Schedule] = []
             for row in parser.parsed_rows:
